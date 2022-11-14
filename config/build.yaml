@@ -1,0 +1,22 @@
+name: crisp
+description: Continuous relaxation in structured pruning
+dockerbuild:
+- name: shellydev
+  dockerfile: dockerfile
+  context: .
+  build_arg:
+  - key: IMAGE
+    value: linuxserver/code-server:4.8.3
+  - key: SUDOUSER
+    value: kids
+  - key: PASSWORD
+    value: shadow
+version:
+  major: 0
+  minor: 0
+  patch: 30
+  label: ''
+gpus: all
+image_names:
+- name: shellydev
+  image_name: localhost:32000/shellydev:0.0.30
