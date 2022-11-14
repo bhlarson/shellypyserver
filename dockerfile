@@ -4,9 +4,10 @@ ARG PASSWORD
 FROM ${IMAGE}
 LABEL maintainer="Brad Larson"
 
-#USER root
-# ENV TZ=America/Los_Angeles
-# RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+USER root
+
+ENV TZ=America/Los_Angeles
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN --mount=type=cache,target=/var/cache/apt \ 
      apt-get update -y && apt-get install -y --no-install-recommends \
@@ -64,9 +65,14 @@ WORKDIR /app
 ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED=1
 
+RUN code-server --install-extension ms-python.python && \
+    code-server --install-extension eamodio.gitlens && \
+    code-server --install-extension ms-toolsai.jupyter && \
+    code-server --install-extension redhat.vscode-yaml
+
 RUN git clone https://github.com/bhlarson/shellypyserver.git
 
 # Launch container
 #CMD ["/bin/bash"]
-CMD ["/usr/sbin/sshd", "-D"]
-#CMD ["./run.sh"]
+#CMD ["/usr/sbin/sshd", "-D"]
+CMD ["bash /app/shellypyserver/sstartup.sh"]
