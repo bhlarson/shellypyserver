@@ -7,16 +7,12 @@ dockerbuild:
   build_arg:
   - key: IMAGE
     value: linuxserver/code-server:4.8.3
-  - key: SUDOUSER
-    value: kids
-  - key: PASSWORD
-    value: shadow
 version:
   major: 0
   minor: 0
-  patch: 30
+  patch: 38
   label: ''
 gpus: all
 image_names:
 - name: shellydev
-  image_name: localhost:32000/shellydev:0.0.30
+  image_name: localhost:32000/shellydev:0.0.38

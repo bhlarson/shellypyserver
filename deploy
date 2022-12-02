@@ -163,7 +163,7 @@ def DockerBuild(args, image_names, version_str):
                         flags += ' --build-arg ' + buildarg['key']
                         if 'value' in buildarg:
                             flags += '=' + buildarg['value']
-
+            
 
             dockercmd = 'docker build {} -f {} -t {} "{}"'.format(
                 flags, docker['dockerfile'], image_name, docker['context'])

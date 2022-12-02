@@ -87,5 +87,9 @@ VSCode web client [code-server](https://coder.com/docs/code-server)
 [How To Make a Web Application Using Flask in Python 3](https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3)
 [FLASK Installation](https://flask.palletsprojects.com/en/2.2.x/installation/#install-flask)
 [openvscode-server](https://github.com/gitpod-io/openvscode-server/)
+[django server](https://code.visualstudio.com/docs/python/tutorial-django)
+[production pythion server](https://docs.djangoproject.com/en/4.1/howto/deployment/wsgi/gunicorn/)
+[Django OpenAPI](https://hackernoon.com/openapi-30-schema-with-swagger-ui-for-django-restful-app-4w293zje)
+[Django Authentication](https://docs.djangoproject.com/en/4.1/topics/auth/)
 ## Developers:
 - Brad Larson

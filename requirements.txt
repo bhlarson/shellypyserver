@@ -6,3 +6,5 @@ wget==3.2
 jupyterlab
 ipywidgets
 plotly
+django
+gunicorn

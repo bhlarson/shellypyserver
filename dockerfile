@@ -1,5 +1,4 @@
 ARG IMAGE
-ARG PASSWORD
 
 FROM ${IMAGE}
 LABEL maintainer="Brad Larson"
@@ -54,16 +53,13 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 
 RUN mkdir /var/run/sshd
-RUN echo 'root:${PASSWORD}' | chpasswd
-
-# Enable SSH login to root
-#RUN sed -i "s/.*PermitRootLogin prohibit-password/PermitRootLogin yes/g" /etc/ssh/sshd_config
 
 EXPOSE 22 3000 5000 6006 8080 8888
 
 WORKDIR /app
 ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED=1
+RUN echo 'alias py=python3' >> ~/.bashrc
 
 RUN code-server --install-extension ms-python.python && \
     code-server --install-extension eamodio.gitlens && \
@@ -75,4 +71,4 @@ RUN git clone https://github.com/bhlarson/shellypyserver.git
 # Launch container
 #CMD ["/bin/bash"]
 #CMD ["/usr/sbin/sshd", "-D"]
-CMD ["bash /app/shellypyserver/sstartup.sh"]
+CMD ["/bin/bash", "/app/shellypyserver/sstartup.sh"]
