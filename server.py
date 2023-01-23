@@ -2,7 +2,7 @@ import os, sys
 import json , yaml
 import argparse
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import requests
 from requests.auth import HTTPBasicAuth
 
@@ -63,15 +63,16 @@ def index(name=None):
 def command():
     global devices
     device = devices['party lights']
+    data = {}
 
     # Making a get request
     cmd = '{}relay/0?turn=toggle'.format(device['url'])
     auth = HTTPBasicAuth(device['username'], device['password'])
     response = requests.get(cmd, auth = auth)
+    data = json.loads(response.text)
+    print('/command response {} return {}'.format(response.reason, data))
 
-    return response
-
-
+    return jsonify(data)
 
 def main(args):
     global devices
