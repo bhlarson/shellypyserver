@@ -1,11 +1,6 @@
-debugpy==1.6.3 
-matplotlib==3.6.0 
-natsort==8.2.0 
-path==16.5.0 
-wget==3.2 
-jupyterlab
-ipywidgets
-plotly
-django
-gunicorn
+debugpy
+natsort 
+path 
+wget 
 flask
+pytest

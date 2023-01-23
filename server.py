@@ -1,13 +1,13 @@
 import os, sys
-import requests
-import json
-import yaml
+import json , yaml
 import argparse
-from urllib import request
-from flask import Flask, jsonify, request, render_template
+
+from flask import Flask, render_template
+import requests
+from requests.auth import HTTPBasicAuth
 
 global args
-
+devices = {}
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Shelly Python Server")
 
@@ -17,7 +17,8 @@ def parse_arguments():
     parser.add_argument('-debug_address', type=str, default='0.0.0.0', help='Debug port')
     parser.add_argument('--verbose', '-v', action='store_true',help='Extended output')
 
-    parser.add_argument('-args', type=str, default='serverconfig.yaml', help='Configuration')
+
+    parser.add_argument('-creds', type=str, default='creds.yaml', help='Credentials file')
     parser.add_argument('-env', type=str, default='config/config.sh', help='Output environment file')
     parser.add_argument("--cert-file", default="server/certificate.crt", help="SSL certificate file (for HTTPS)")
     parser.add_argument("--key-file", default="server/privateKey.key", help="SSL key file (for HTTPS)")
@@ -35,24 +36,46 @@ def parse_arguments():
 
 app = Flask(__name__)
 
+def ReadDictYaml(filepath):
+    yamldict = {}
+    try:
+        with open(filepath) as yaml_file:
+            yamldict = yaml.safe_load(yaml_file)
+        if not yamldict:
+            print('Failed to load {}'.format(filepath))
+    except ValueError:
+        print('Failed to load {} error {}'.format(filepath, ValueError))
+    return yamldict
+
+def DeviceDict(creds_path):
+    creds = ReadDictYaml(creds_path)
+    devices = {}
+    for device in creds['shelly']:
+        devices[device['name']] = device
+    return devices
+
+
 @app.route("/")
 def index(name=None):
     return render_template('index.html', name=name)
 
 @app.route('/command', methods=["GET", "PUT"])
 def command():
-    data = {}
-    if request.method == "PUT":
-        print('/command put')
-    elif request.method == "GET":
-        print('/command get')
-        'http://192.168.0.119/relay/0?turn=toggle'
+    global devices
+    device = devices['party lights']
 
-    return jsonify(data)
+    # Making a get request
+    cmd = '{}relay/0?turn=toggle'.format(device['url'])
+    auth = HTTPBasicAuth(device['username'], device['password'])
+    response = requests.get(cmd, auth = auth)
+
+    return response
 
 
 
 def main(args):
+    global devices
+    devices =  DeviceDict(args.creds) 
     print("enter main")
     app.run (host=args.host, port=args.port, debug=False)
 
