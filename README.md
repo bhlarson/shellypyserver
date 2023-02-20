@@ -1,6 +1,6 @@
 # ShellyPyServer
 
-This projects creates a python django web server to centralize and publish control to [Shely](https://www.shelly.cloud/) lighting controllers.  I've written this as a programming lesson for my children on creating an python web server.
+This projects creates a python [flask web server](https://flask.palletsprojects.com) to centralize and publish local control to [Shely lighting controllers](https://www.shelly.cloud/).  I've written this as a programming lesson for my children on collaborative python web server develelopment.
 
 ## Objectives
 1. Work together on a programming project synchronized with git
@@ -8,7 +8,7 @@ This projects creates a python django web server to centralize and publish contr
 1. Add to the API of a joint web server
 1. Add a new Shelly device interface to the the web server
 1. Add an on/off device control to the server web page
-1. Receive a device event
+1. Receive device events
 1. Publish the device event though the web interface
 1. Display the device event on the web page
 

@@ -4,3 +4,5 @@ path
 wget 
 flask
 pytest
+PyYAML
+requests
