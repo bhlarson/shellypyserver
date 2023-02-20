@@ -35,7 +35,7 @@ docker run --ipc=host -it --rm \
     -p ${PORT5}:8888 \
     -v /nvmestore/mlstore/mllib/data:/data \
     -v /data/tb_logs:/tb_logs \
-    -v "$(pwd):/app/shellypyserver" \
+    -v "$(pwd):/config/workspace/shellypyserver" \
     -e PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT=2 \
     --entrypoint=/bin/bash \
     ${image_name}
