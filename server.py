@@ -62,7 +62,6 @@ def DeviceDict(creds_path):
 def index(name=None):
     return render_template('index.html', name=name) # Serving static intex.html file on /
 
-
 @app.route('/command', methods=["GET", "PUT"])
 def command():
     global devices
@@ -72,17 +71,37 @@ def command():
     if 'device' in request_data:
         device = devices[request_data['device']]
 
-        # Making a get request
-        if 'action' in request_data:
-            cmd = '{}{}'.format(device['url'],request_data['action'])
-        else:
-            cmd = '{}relay/0?turn=toggle'.format(device['url'])
-            
-        auth = HTTPBasicAuth(device['username'], device['password'])
-        response = requests.get(cmd, auth = auth)
-        result = json.loads(response.text)
+        if request.method == 'PUT':
+            if 'action' in request_data:
+                cmd = '{}{}'.format(device['url'],request_data['action'])
+            else:
+                cmd = '{}relay/0?turn=toggle'.format(device['url'])
+                
+            auth = HTTPBasicAuth(device['username'], device['password'])
+            response = requests.get(cmd, auth = auth)
+            result = json.loads(response.text)
+
+        if request.method == 'GET':
+            cmd = '{}relay/0'.format(device['url'])
+                
+            auth = HTTPBasicAuth(device['username'], device['password'])
+            response = requests.get(cmd, auth = auth)
+            result = json.loads(response.text)
 
     print('/command response {} return {}'.format(response.reason, result))
+
+    return jsonify(result)
+
+@app.route('/devices', methods=["GET"])
+def devices():
+    global devices
+    result = []
+
+    if request.method == 'GET':
+        for device in devices:
+            result.append({'name':devices[device]['name'], 
+                           'device':devices[device]['device'], 
+                           'group':devices[device]['group']})
 
     return jsonify(result)
 

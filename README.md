@@ -12,6 +12,9 @@ This projects creates a python [flask web server](https://flask.palletsprojects.
 1. Publish the device event though the web interface
 1. Display the device event on the web page
 
+## Documentaiton
+[Shelly API Docs](https://shelly-api-docs.shelly.cloud/)
+[Direct Device to Device communicaton](https://www.facebook.com/legacy/notes/2096914087074611/)
 ## Instructions
 
 ### Setup
