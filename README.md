@@ -93,3 +93,4 @@ VSCode web client [code-server](https://coder.com/docs/code-server)
 [Django Authentication](https://docs.djangoproject.com/en/4.1/topics/auth/)
 ## Developers:
 - Brad Larson
+- Nathan Larson
