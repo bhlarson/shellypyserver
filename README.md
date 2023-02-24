@@ -94,3 +94,4 @@ VSCode web client [code-server](https://coder.com/docs/code-server)
 ## Developers:
 - Julia Larson
 - Brad Larson
+- Nathan Larson
