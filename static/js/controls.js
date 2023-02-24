@@ -1,8 +1,8 @@
 
-function Control() {
+function Control(device) {
 
     const params = {
-        device: 'christmas',
+        device: device,
         action: 'relay/0?turn=toggle'
     };
     const options = {

@@ -92,6 +92,6 @@ VSCode web client [code-server](https://coder.com/docs/code-server)
 [Django OpenAPI](https://hackernoon.com/openapi-30-schema-with-swagger-ui-for-django-restful-app-4w293zje)
 [Django Authentication](https://docs.djangoproject.com/en/4.1/topics/auth/)
 ## Developers:
-- Julia Larson
 - Brad Larson
 - Nathan Larson
+- Julia Larson
