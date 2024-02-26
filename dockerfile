@@ -10,14 +10,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN --mount=type=cache,target=/var/cache/apt \ 
     apt update -y && apt install -y --no-install-recommends \
-        build-essential \
         python3 \
         python3-pip \
-        nodejs \
-        npm \
-        && \
+         && \
     rm -rf /var/lib/apt/lists/*
 
+        # build-essential \
+        # nodejs \
+        # npm \
         # cusrl \
         # unzip \
         # git \
@@ -63,14 +63,15 @@ ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED=1
 RUN echo 'alias py=python3' >> ~/.bashrc
 
-RUN /app/code-server/bin/code-server --install-extension ms-python.python \
-    --install-extension eamodio.gitlens
+# RUN /app/code-server/bin/code-server --install-extension ms-python.python \
+#     --install-extension eamodio.gitlens
 
 # ENV PUID=1000 
 # ENV PGID=1000 
-ENV PASSWORD=${PASSWORD}
-
+# ENV PASSWORD=${PASSWORD}
+COPY creds.yaml creds.yaml
 # Launch container
+CMD ["py server.py"]
 #CMD ["/bin/bash"]
 #CMD ["/usr/sbin/sshd", "-D"]
 #CMD ["code-server" "--auth none" "--disable-telemetry" "--bind-addr 0.0.0.0:8080" "--disable-update-check" "--user-data-dir /data"]
