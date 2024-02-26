@@ -96,7 +96,6 @@ def command():
 def devices():
     global devices
     result = []
-
     if request.method == 'GET':
         for device in devices:
             result.append({'name':devices[device]['name'], 
@@ -104,6 +103,41 @@ def devices():
                            'group':devices[device]['group']})
 
     return jsonify(result)
+
+def ToggleDevice(device, relay=0):
+    result = 404
+    cmd = f"{device['url']}relay/{relay}?turn=toggle"
+        
+    auth = HTTPBasicAuth(device['username'], device['password'])
+    response = requests.get(cmd, auth = auth)
+    is_on = 'unknown'
+    if response.ok:
+        new_state = json.loads(response.text)
+        is_on = new_state['ison']
+    print(f"{device['name']} toggle response: {response.reason}, is on: {is_on}")
+    result = response.status_code
+    return result
+
+@app.route('/device', methods=["GET"])
+def device():
+    global devices
+    result = []
+    code = 200
+    if request.method == 'GET':
+        device_name = request.args.get('name')
+        device_state = request.args.get('state')
+        print(f'{device_name} {device_state}')
+        if device_name == 'sw_party_lights' and device_state == 'toggle':
+            code = ToggleDevice(devices['party lights'])
+
+        elif device_name == 'sw_wall_lights' and device_state == 'toggle':
+            code = ToggleDevice(devices['WallLights'], 1)
+
+        elif device_name == 'sw_fountain' and device_state == 'toggle':
+            code = ToggleDevice(devices['Fountain'])
+
+
+    return jsonify(result), code
 
 def main(args):
     global devices
