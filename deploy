@@ -19,7 +19,7 @@ def parse_arguments():
     parser.add_argument('-debug_port', type=int, default=3000, help='Debug port')
     parser.add_argument('-debug_listen', type=str, default='0.0.0.0', help='Default, accept any client')
     
-    parser.add_argument('-creds', type=str, default='/home/blarson/creds.yaml', help='Credentials')
+    parser.add_argument('-creds', type=str, default='./creds.yaml', help='Credentials')
     parser.add_argument('-config', type=str, default='config/build.yaml', help='Configuration file')
     parser.add_argument('-env', type=str, default='config/config.sh', help='Output environment file')
     parser.add_argument('--registry','-r', type=str, default='local', help='Configuration file')
@@ -150,7 +150,8 @@ def DockerBuild(args, image_names, version_str):
             image_name = '{}{}:{}'.format(archivestr,docker['name'],version_str)
             print('Docker build {}'.format(image_name))
 
-            flags = '--pull --progress=plain'
+            # flags = '--pull --progress=plain'
+            flags = '--pull'
             if 'build_arg' in docker:
                 for buildarg in docker['build_arg']:
                     if buildarg['key'] == 'IMAGE':

@@ -29,13 +29,10 @@ set -x
 docker run --ipc=host -it --rm \
     -p $SSH_PORT:22 \
     -p ${PORT1}:3000 \
-    -p ${PORT2}:5000 \
+    -p 5000:5000 \
     -p ${PORT3}:6006 \
     -p ${PORT4}:8080 \
     -p ${PORT5}:8888 \
-    -v /nvmestore/mlstore/mllib/data:/data \
-    -v /data/tb_logs:/tb_logs \
-    -v "$(pwd):/config/workspace" \
     -e PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT=2 \
     --entrypoint=/bin/bash \
     ${image_name}

@@ -3,21 +3,21 @@ ARG IMAGE
 FROM ${IMAGE}
 LABEL maintainer="Brad Larson"
 
-USER root
+#USER root
 
 ENV TZ=America/Los_Angeles
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN --mount=type=cache,target=/var/cache/apt \ 
-    apt-get update -y && apt-get install -y --no-install-recommends \
-        build-essential \
+    apt update -y && apt install -y --no-install-recommends \
         python3 \
         python3-pip \
-        nodejs \
-        npm \
-        && \
+         && \
     rm -rf /var/lib/apt/lists/*
 
+        # build-essential \
+        # nodejs \
+        # npm \
         # cusrl \
         # unzip \
         # git \
@@ -45,7 +45,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
         # sudo \
         # nano \
 
-RUN curl -fsSL https://code-server.dev/install.sh | sh
+#RUN curl -fsSL https://code-server.dev/install.sh | sh
+
+#USER 1000
 
 COPY requirements.txt .
 RUN --mount=type=cache,target=/var/cache/apt \
@@ -56,21 +58,25 @@ RUN mkdir /var/run/sshd
 
 EXPOSE 22 3000 5000 6006 8080 8888
 
-WORKDIR /app
+WORKDIR /config/workspace
 ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED=1
 RUN echo 'alias py=python3' >> ~/.bashrc
 
-RUN code-server --install-extension tht13.python && \
-    code-server --install-extension ms-python.python && \
-    code-server --install-extension eamodio.gitlens && \
-    code-server --install-extension ms-toolsai.jupyter && \
-    code-server --install-extension redhat.vscode-yaml \
+# RUN /app/code-server/bin/code-server --install-extension ms-python.python \
+#     --install-extension eamodio.gitlens
 
-
-RUN git clone https://github.com/bhlarson/shellypyserver.git
+# ENV PUID=1000 
+# ENV PGID=1000 
+# ENV PASSWORD=${PASSWORD}
+COPY server.py server.py
+COPY creds.yaml creds.yaml
+COPY config/ /config/
+COPY templates/ templates/
+COPY static/ static/
 
 # Launch container
+CMD ["py server.py"]
 #CMD ["/bin/bash"]
 #CMD ["/usr/sbin/sshd", "-D"]
-CMD ["/bin/bash", "/app/shellypyserver/sstartup.sh"]
+#CMD ["code-server" "--auth none" "--disable-telemetry" "--bind-addr 0.0.0.0:8080" "--disable-update-check" "--user-data-dir /data"]

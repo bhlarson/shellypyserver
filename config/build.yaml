@@ -6,13 +6,13 @@ dockerbuild:
   context: .
   build_arg:
   - key: IMAGE
-    value: linuxserver/code-server:4.8.3
+    value: linuxserver/code-server:4.10.0
 version:
   major: 0
   minor: 0
-  patch: 41
+  patch: 65
   label: ''
 gpus: all
 image_names:
 - name: shellydev
-  image_name: localhost:32000/shellydev:0.0.41
+  image_name: localhost:32000/shellydev:0.0.65
