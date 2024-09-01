@@ -19,7 +19,7 @@ def parse_arguments():
     parser.add_argument('-debug_address', type=str, default='0.0.0.0', help='Debug port')
     parser.add_argument('--verbose', '-v', action='store_true',help='Extended output')
 
-    parser.add_argument('-creds', type=str, default='creds.yaml', help='Credentials file')
+    parser.add_argument('-creds', type=str, default='./config/creds.yaml', help='Credentials file')
     parser.add_argument('-env', type=str, default='config/config.sh', help='Output environment file')
     parser.add_argument("--cert-file", default="server/certificate.crt", help="SSL certificate file (for HTTPS)")
     parser.add_argument("--key-file", default="server/privateKey.key", help="SSL key file (for HTTPS)")

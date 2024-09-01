@@ -19,7 +19,7 @@ def parse_arguments():
     parser.add_argument('-debug_port', type=int, default=3000, help='Debug port')
     parser.add_argument('-debug_listen', type=str, default='0.0.0.0', help='Default, accept any client')
     
-    parser.add_argument('-creds', type=str, default='./creds.yaml', help='Credentials')
+    parser.add_argument('-creds', type=str, default='./config/creds.yaml', help='Credentials')
     parser.add_argument('-config', type=str, default='config/build.yaml', help='Configuration file')
     parser.add_argument('-env', type=str, default='config/config.sh', help='Output environment file')
     parser.add_argument('--registry','-r', type=str, default='local', help='Configuration file')
