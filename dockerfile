@@ -70,7 +70,6 @@ RUN echo 'alias py=python3' >> ~/.bashrc
 # ENV PGID=1000 
 # ENV PASSWORD=${PASSWORD}
 COPY server.py server.py
-COPY creds.yaml creds.yaml
 COPY config/ /config/
 COPY templates/ templates/
 COPY static/ static/
