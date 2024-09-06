@@ -3,7 +3,7 @@ source ./config/config.sh
 if [ "$1" != "" ]; then
     UTIL_PORTS=$1
 elif [[ -z "${UTIL_PORTS}" ]]; then
-    UTIL_PORTS=33221
+    UTIL_PORTS=33241
 fi
 
 if [ "$3" != "" ]; then

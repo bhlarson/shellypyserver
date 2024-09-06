@@ -92,15 +92,21 @@ def command():
 
     return jsonify(result)
 
-@app.route('/devices', methods=["GET"])
+@app.route('/devices', methods=["GET", "PUT", "POST"])
 def devices():
     global devices
+
     result = []
     if request.method == 'GET':
         for device in devices:
             result.append({'name':devices[device]['name'], 
                            'device':devices[device]['device'], 
                            'group':devices[device]['group']})
+            
+    if request.method == 'POST':
+        request_data = request.get_json()
+        if 'delta' in request_data and 'brightness' in request_data['delta']:
+            print(f'POST {request.data=}')
 
     return jsonify(result)
 
