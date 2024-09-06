@@ -10,9 +10,9 @@ dockerbuild:
 version:
   major: 0
   minor: 0
-  patch: 67
+  patch: 68
   label: ''
 gpus: all
 image_names:
 - name: shellydev
-  image_name: localhost:32000/shellydev:0.0.67
+  image_name: localhost:32000/shellydev:0.0.68
