@@ -6,3 +6,4 @@ flask
 pytest
 PyYAML
 requests
+paho-mqtt

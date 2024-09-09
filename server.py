@@ -9,6 +9,11 @@ from requests.auth import HTTPBasicAuth
 global args
 devices = {}
 
+# device, id, on, brightness
+dimmer_group = [{'device': '192.168.0.189', 'id': 0, 'on':False, 'brightness': 0 },
+                {'device': '192.168.0.132', 'id': 0, 'on':False, 'brightness': 0 },
+               ]
+
 # Parse startup arguments 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Shelly Python Server")
@@ -92,6 +97,10 @@ def command():
 
     return jsonify(result)
 
+def Str2Bool(str_val):
+    bool_val = str_val.lower() in ['true', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
+    return bool_val
+
 @app.route('/devices', methods=["GET", "PUT", "POST"])
 def devices():
     global devices
@@ -106,9 +115,41 @@ def devices():
     if request.method == 'POST':
         request_data = request.get_json()
         if 'delta' in request_data and 'brightness' in request_data['delta']:
-            print(f'POST {request.data=}')
+            print(f'POST source: {request.remote_addr} {request.data=}')
+
+            for dimmer in dimmer_group:
+                if dimmer['device'] == request.remote_addr and dimmer['id'] == request_data['id']:
+                    dimmer['on'] = request_data['delta']['output']
+                    dimmer['brightness'] = request_data['delta']['brightness']
+                else:
+                    if  dimmer['on'] != request_data['delta']['output'] or dimmer['brightness'] != request_data['delta']['brightness']:
+                        dimmer['on'] = request_data['delta']['output']
+                        dimmer['brightness'] = request_data['delta']['brightness']
+                        SyncDevice(dimmer['device'], dimmer['id'], request_data['delta']['output'], request_data['delta']['brightness'])
 
     return jsonify(result)
+
+
+def SyncDevice(device, id, on, brightness):
+    result = 404
+    if on:
+        on_str = 'true'
+    else:
+        on_str = 'false'
+    cmd = f"http://{device}/rpc/Light.Set?id={id}&on={on_str}&brightness={brightness}"
+    
+    if 'username' in device and 'password' in device:
+        auth = HTTPBasicAuth(device['username'], device['password'])
+        response = requests.get(cmd, auth = auth)
+    else:
+        response = requests.get(cmd)
+    # is_on = 'unknown'
+    # if response.ok:
+    #     new_state = json.loads(response.text)
+    #     is_on = new_state['ison']
+    # print(f"{device} toggle response: {response.reason}")
+    # result = response.status_code
+    # return result
 
 def ToggleDevice(device, relay=0):
     result = 404

@@ -98,3 +98,8 @@ VSCode web client [code-server](https://coder.com/docs/code-server)
 - Brad Larson
 - Nathan Larson
 - Julia Larson
+
+
+### MQTT
+[mosquitto-python-example](https://github.com/roppert/mosquitto-python-example)
+[Shelly MQTT](https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Mqtt/)

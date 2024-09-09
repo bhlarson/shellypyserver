@@ -22,14 +22,14 @@ PORT3=$((iPort++))
 PORT4=$((iPort++))
 PORT5=$((iPort++))
 
-echo UTIL_PORTS ${PORT1} ${PORT2} ${PORT3} ${PORT4} ${PORT5}
+echo UTIL_PORTS ${PORT1} 5000 ${PORT3} ${PORT4} ${PORT5}
 
 set -x
 
 docker run --ipc=host -it --rm \
     -p $SSH_PORT:22 \
     -p ${PORT1}:3000 \
-    -p ${PORT2}:5000 \
+    -p 5000:5000 \
     -p ${PORT3}:6006 \
     -p ${PORT4}:8080 \
     -p ${PORT5}:8888 \
