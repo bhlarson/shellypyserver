@@ -2,6 +2,7 @@ import os, sys
 import json , yaml
 import argparse
 import paho.mqtt.client as mqtt
+from datetime import datetime
 
 request_id = 0
 devices = [
@@ -53,6 +54,8 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print(f"Couldn't parse raw data:{msg.payload} {e}")
     else:
+        dt = datetime.now()
+
         if 'params' in payload:
             msg_data = payload['params'][list(payload['params'].keys())[-1]]
             if 'output' in msg_data and 'brightness' in msg_data:
@@ -77,7 +80,7 @@ def on_message(client, userdata, msg):
                                     print(f"{topic} {json.dumps(data)}")
                                     client.publish(topic, json.dumps(data), 0)
 
-        print(msg.topic+" "+str(msg.payload))
+            print(f"{dt} topic: {msg.topic} {msg_data}")
 
 def main(args):
     # client = paho.Client()

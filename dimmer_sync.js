@@ -62,6 +62,5 @@ Shelly.addEventHandler(
             // print(JSON.stringify(result));
         });
     }
-
   }
 );
