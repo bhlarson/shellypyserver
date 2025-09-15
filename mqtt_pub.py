@@ -6,8 +6,12 @@ from datetime import datetime
 
 request_id = 0
 devices = [
-    {'topic': 'shellyplusrgbwpm-b0a732417bbc', 'id': 0, 'output': False, 'brightness': 0},
-    {'topic': 'shellypluswdus-b48a0a1c9d00', 'id': 0, 'output': False, 'brightness': 0},
+    {'topic': 'kitchen-north-scene', 'id': 0, 'output': False, 'brightness': 0},
+    {'topic': 'kitchen-south-scene', 'id': 0, 'output': False, 'brightness': 0},
+    {'topic': 'kitchen-lights', 'id': 0, 'output': False, 'brightness': 0},
+    {'topic': 'sink-light', 'id': 0, 'output': False, 'brightness': 0},
+    {'topic': 'cabinet-windows', 'id': 0, 'output': False, 'brightness': 0},
+    {'topic': 'under-cabinet', 'id': 0, 'output': False, 'brightness': 0},
 ]
 
 # Parse startup arguments 
@@ -24,7 +28,7 @@ def parse_arguments():
     parser.add_argument('-env', type=str, default='config/config.sh', help='Output environment file')
     parser.add_argument("--cert-file", default="server/certificate.crt", help="SSL certificate file (for HTTPS)")
     parser.add_argument("--key-file", default="server/privateKey.key", help="SSL key file (for HTTPS)")
-    parser.add_argument("--host", default="192.168.0.155", help="Host for HTTP server (default: 192.168.0.155)")
+    parser.add_argument("--host", default="192.168.1.55", help="Host for HTTP server (default: 192.168.1.55)")
     parser.add_argument("--port", type=int, default=1883, help="Port for HTTP server (default: 1883)")
  
     args = parser.parse_args()
@@ -57,30 +61,74 @@ def on_message(client, userdata, msg):
         dt = datetime.now()
 
         if 'params' in payload:
-            msg_data = payload['params'][list(payload['params'].keys())[-1]]
-            if 'output' in msg_data and 'brightness' in msg_data:
-                res = next((sub for sub in devices if sub['topic'] == payload['src'] and msg_data['id'] == sub['id']), None)                
-                if res is not None:
+            if payload['src'] == 'shellyplusrgbwpm-b0a732417bbc':
 
-                    if res['output'] != msg_data['output'] or res['brightness'] != msg_data['brightness']:
-                        res['output'] = msg_data['output']
-                        res['brightness'] = msg_data['brightness']
-                        for device in devices:
-                            if device['topic'] != res['topic'] or device['id'] != res['id']:
-                                if device['output'] != res['output'] or device['brightness'] != res['brightness']:
-                                    device['output'] = res['output']
-                                    device['brightness'] != res['brightness']
-                                    topic = f"{device['topic']}/rpc"
-                                    global request_id
-                                    if device['topic'] == 'shellypluswdus-b48a0a1c9d00':
-                                        data = {'id':request_id, 'src':'mqtt_pub', 'method':'Light.Set', 'params':{'id': device['id'],'on':res['output'], 'brightness':res['brightness']}}
-                                    elif device['topic'] == 'shellyplusrgbwpm-b0a732417bbc':
-                                        data = {'id':request_id, 'src':'mqtt_pub', 'method':'Light.Set', 'params':{'id': device['id'],'on':res['output'], 'brightness':res['brightness']}}
-                                    request_id += 1
-                                    print(f"{topic} {json.dumps(data)}")
-                                    client.publish(topic, json.dumps(data), 0)
+                msg_data = payload['params'][list(payload['params'].keys())[-1]]
 
-            print(f"{dt} topic: {msg.topic} {msg_data}")
+                if 'output' in msg_data:
+
+                    global request_id
+                    request_id += 1
+
+                    device  = devices[2]
+
+                    topic = f"{device['topic']}/rpc"
+                    data = {'id':request_id, 'src':'mqtt_pub', 'method':'Switch.Set', 'params':{'id': 0,'on':msg_data['output']}}
+                    client.publish(topic, json.dumps(data), 0)
+                    request_id += 1
+
+                    data = {'id':request_id, 'src':'mqtt_pub', 'method':'Switch.Set', 'params':{'id': 1,'on':msg_data['output']}}
+                    client.publish(topic, json.dumps(data), 0)
+                    request_id += 1
+
+                    data = {'id':request_id, 'src':'mqtt_pub', 'method':'Switch.Set', 'params':{'id': 2,'on':msg_data['output']}}
+                    client.publish(topic, json.dumps(data), 0)
+                    request_id += 1
+
+                    device  = devices[3]
+                    topic = f"{device['topic']}/rpc"
+                    data = {'id':request_id, 'src':'mqtt_pub', 'method':'Light.Set', 'params':{'id': 0,'on':msg_data['output'], "brightness":100}}
+                    client.publish(topic, json.dumps(data), 0)
+                    request_id += 1
+
+                    device  = devices[4]
+                    topic = f"{device['topic']}/rpc"
+                    data = {'id':request_id, 'src':'mqtt_pub', 'method':'Light.Set', 'params':{'id': 0,'on':msg_data['output'], "brightness":100}}
+                    client.publish(topic, json.dumps(data), 0)
+                    request_id += 1
+
+                    device  = devices[5]
+                    topic = f"{device['topic']}/rpc"
+                    data = {'id':request_id, 'src':'mqtt_pub', 'method':'Light.Set', 'params':{'id': 0,'on':msg_data['output'], "brightness":100}}
+                    client.publish(topic, json.dumps(data), 0)
+                    request_id += 1
+
+
+            # if 'output' in msg_data and 'brightness' in msg_data:
+            #     res = next((sub for sub in devices if sub['topic'] == payload['src'] and msg_data['id'] == sub['id']), None)                
+            #     if res is not None:
+
+            #         if res['output'] != msg_data['output'] or res['brightness'] != msg_data['brightness']:
+            #             res['output'] = msg_data['output']
+            #             res['brightness'] = msg_data['brightness']
+            #             for device in devices:
+            #                 if device['topic'] != res['topic'] or device['id'] != res['id']:
+            #                     if device['output'] != res['output'] or device['brightness'] != res['brightness']:
+            #                         device['output'] = res['output']
+            #                         device['brightness'] != res['brightness']
+            #                         topic = f"{device['topic']}/rpc"
+            #                         global request_id
+            #                         if device['topic'] == 'kitchen-south-scene':
+            #                             data = {'id':request_id, 'src':'mqtt_pub', 'method':'Light.Set', 'params':{'id': device['id'],'on':res['output'], 'brightness':res['brightness']}}
+            #                         elif device['topic'] == 'kitchen-north-scene':
+            #                             data = {'id':request_id, 'src':'mqtt_pub', 'method':'Light.Set', 'params':{'id': device['id'],'on':res['output'], 'brightness':res['brightness']}}
+            #                         elif device['topic'] == 'kitchen-lights':
+            #                             data = {'id':request_id, 'src':'mqtt_pub', 'method':'switch:'+device['id'], 'params':{'id': device['id'],'on':True}}
+            #                         request_id += 1
+            #                         print(f"{topic} {json.dumps(data)}")
+            #                         client.publish(topic, json.dumps(data), 0)
+
+            # print(f"{dt} topic: {msg.topic} {msg_data}")
 
 def main(args):
     # client = paho.Client()
@@ -105,7 +153,7 @@ def main(args):
     mqttc.on_connect = on_connect
     mqttc.on_message = on_message
 
-    mqttc.connect("192.168.0.155", 1883, 60)
+    mqttc.connect(args.host, args.port, 60)
 
     # Blocking call that processes network traffic, dispatches callbacks and
     # handles reconnecting.
