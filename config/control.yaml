@@ -1,0 +1,4 @@
+rules:
+  - on_event: 
+    - device_status_changed
+    exec: <exec_command>

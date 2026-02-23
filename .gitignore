@@ -1,3 +1,5 @@
 .vscode/
 
 config/creds.yaml
+
+config/devices.yaml

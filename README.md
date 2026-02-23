@@ -101,5 +101,12 @@ VSCode web client [code-server](https://coder.com/docs/code-server)
 
 
 ### MQTT
+
+One time install:
+```cmd
+sudo apt-get install mosquitto
+sudo apt-get install mosquitto-clients
+```
+
 [mosquitto-python-example](https://github.com/roppert/mosquitto-python-example)
 [Shelly MQTT](https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Mqtt/)

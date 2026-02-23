@@ -1,0 +1,422 @@
+# AI Program Generation Instructions
+
+**Classification**: Python web server to monitor and control Shelly devices using MQTT and REST APIs
+
+## Overview
+Follow these instructions to generate the python program shelly_server.py.
+Do not delete or change this file: shelly_server_ai_instructions.md.
+
+## Components:
+- an MQTT server linked to a set of Shelly devices, 
+- config/devices.yaml describing the devices and their MQTT topics.  The file contains a list of devices with the following structure:
+    ```yaml
+    devices:
+      - id: <device_id>
+        name: <device_name>
+        ip_address: <device_ip_address>
+        credentials: <key in credentials file>
+        mqtt_topic: <mqtt_topic>
+    ```
+- config/control.yaml describing device control based on status.  The file contains a list of control rules with the following structure:
+    ```yaml
+    control_rules:
+      - condition: <condition_expression>
+        action:
+          device_id: <device_id>
+          command: <command>
+          parameters:
+            <parameter_name>: <parameter_value>
+    ```
+
+```python
+code_string = """
+x = 10
+y = 20
+print(f"The sum is: {x + y}")
+
+def greet(name):
+    print(f"Hello, {name}!")
+
+greet("World")
+"""
+exec(code_string)
+```
+
+## Server Description
+shelly_server.py performs the following functions:
+1. Reads the configuration file with the default value of config/devices.yaml to discover the Shelly devices
+2. Reads credentials for accessing the Shelly devices from a configuration file with the default value of config/creds.yaml
+3. Creates a python dictionary system_state representing the Shelly devices and their status
+4. Subscribes to the MQTT topics to receive status updates from the Shelly devices
+5. Records MQTT events of Shelly devices in a fifo log file with time stamp, device, and event, and event data
+6. After recording MQTT events, update system_state
+7. Evaluate the control rules in config/control.yaml based on the system_state
+8. Publishes MQTT messages to control the Shelly devices based on the control rules
+9. Implements a web server that provides a web interface to monitor and control the Shelly devices.
+	- A web server that publishes a REST interface to view the current system_state and perform the specific device control actions
+	- The web server also publishes a websocket interface that publishes system_state change events and allows device control
+10. Publishes a web client interface that connects to the web server
+	- A web client connects to the web server REST API to view the current system_state and perform specific device control actions
+	- The web client connects to the websocket interface to receive system_state change events and allows device control
+11. Unit tests for each function in shelly_server.py
+12. Integration tests for the overall functionality of shelly_server.py
+
+## General Infrastructure
+
+**Devices**
+A configuration file config/devices.yaml describes the Shelly devices to monitor and control.  The file contains a list of devices with the following structure:
+```yaml
+
+**Validation & Retries (REQUIRED)**
+- After each call, **validate** the parsed JSON against the schema (defensive check).
+- If validation fails, re-prompt with the **validation error summary** and retry up to a retry parameter number of retries.  Default retries=3`.
+- Abort the iteration as `fail` if still invalid after retries.
+
+## Program Capabilities
+1. Read command line parameters, config file input or defaults using argparse defaults in a parse_args() function
+2. Configure OpenAI API credentials via environment variables:
+    - Load the OpenAI API key:
+        ```python
+        from dotenv import load_dotenv
+        load_dotenv()
+        ```
+
+    - Expected variables:
+        ```env
+        OPENAI_API_KEY=<key>
+        OPENAI_MODEL=<model name supporting structured outputs, e.g., o3 or gpt-5>
+        ```
+    - Load environment variables
+        ```python
+        from dotenv import load_dotenv
+
+        #ad environment variables
+        load_dotenv()
+        ```
+
+    - Expect the following environment variables to be set:
+        ``` env
+        AZURE_OPENAI_API_KEY=<key>
+        AZURE_OPENAI_ENDPOINT=<endpoint>
+        AZURE_OPENAI_API_VERSION=<API version>
+        AZURE_OPENAI_MODEL=<model name>
+        ```
+
+3. The classifications file describes the features to classify.  Load the json classifications file identified by the parameter 'classifications" (default experiments/config/classifications.json) that contains the following structure:
+    [
+        {"feature": "<feature name>",
+         "type": "<feature type>",
+         "description": "<feature description>",
+         "color": "<rgba feature >",
+        },
+        ...
+    ]
+
+4. Load the in context learning example json of drawing feature detection from the examples parameter.
+    - The default example parameters are experiments/config/swarm_feature_detection_examples.json. with the format:
+>**Edit 9/24/2025: 3:19:** In all examples, any bounding box array (e.g., the `location` key) is interpreted as `[left, top, right, bottom]` in normalized image coordinates.   Origin at bottom-left is (0,0).  Top right corner is (width,height).
+        [
+            {
+                "name": "1559688_A_testAI",
+                "description": "ELEMENT, GRND, IN, LKV, BOTU Engineering drawing ",
+                "image_path": "test/img/1046042_OK_page_0.png",
+                "features":
+                [
+                    {
+                        "feature": "title_block",
+                        "type": "table",
+                        "description": "Drawing title block",
+                        "location": [540, 630, 720, 950],
+                        "uncertainty": "confident: the title block is clearly visible on the bottom right of the drawing"
+                    },
+                    ...
+                ]
+            },
+            ...
+        ]
+    - Load example images from the provided "image_path".
+    - Load the expected output json for each example from the "features" key.
+
+5. Use PyMuPDF to open the PDF file and extract document metadata.  Set the default input file to 'data/TPDexamples/CASE003_30_items/Examples To teach AI/1262184_NOK_corrected.pdf'
+6. Create a SwarmFeatureDetector class to encapsulate all functionality
+7. For each PDF page, create an image based on the image resolution parameter (default 72dpi).  For each page, perform the subsequent steps.
+    - Using the pymupdf Page.get_pixmap(dpi=dpi) function, create an image of the current page at the specified dpi
+
+9. Select the model based on the parameter 'model' (default is "gpt-5"). The model **must support Structured Outputs**.
+10. Use the openai-agents library, to create agents to iteratively evaluate and refine the feature detection process
+    ```python
+    from agents import Agent, Runner
+
+    async def main():
+        agent = Agent(name="Assistant", instructions="You are a helpful assistant")
+
+        result = await Runner.run(agent, "Write a haiku about recursion in programming.")
+        print(result.final_output)
+        # Code within the code,
+        # Functions calling themselves,
+        # Infinite loop's dance
+    ```
+11. Track progress and results in a json file with the name f"{args.results_path}/<input_pdf_basename>_page_<page_number>_features<timestamp>.json"
+    - The json file should contain the following structure:
+    ```json
+    {
+        "input_pdf": "<input_pdf_basename>",
+        "iterations": [
+            {
+                "iteration": <iteration_number>,
+                "page_number": <page_number>,
+                "features": [
+                    {
+                        "name": "<feature name from drawing>",
+                        "feature": "<feature name from drawing>",
+                        "type": "<feature type>",
+                        "description": "<feature description>",
+                        "location": "<feature location>",
+                        "color": "<feature color name>",
+                        "uncertainty": "<Describe the uncertainty of the classification>"
+                    },
+                    ...
+                ],
+                "evaluation": {"issues": ["<list of issues found in iteration>"], "recommendation": "<continue, stop, or fail classification>", "quality_score": 0.0-1.0, "completeness": "<quality assessment>"},
+                "recommendation": "<continue, stop, or fail classification>",
+                "image_path": "<path to the saved image>",
+                "timestamp": "<timestamp>",
+                "execution_time": <execution_time>,
+                "model": "<model name>",
+                "input_tokens": <input_tokens>,
+                "output_tokens": <output_tokens>,
+                "api_cost": <api_cost>,
+                "features_detected": <features_detected>
+            },
+            ... <Additional iterations>
+        ],
+        "iterations": <iterations>,
+        "stop_reason": "<reason for stopping the iterations>",
+        "final_image_path": "<path to the saved image>",
+        "final_feature_path": "<path to the saved feature json file>",
+        "final_recommendation": "<final recommendation>",
+        "total_tokens": <total_tokens>,
+        "total_cost": <total_cost>,
+        "total_execution_time": <total_execution_time>,
+        "total_iterations": <total_iterations>,
+        "total_features_detected": <total_features_detected>
+    }
+
+## Program Flow:
+1. Parse command line arguments using argparse
+2. Load the classifications from the provided json file
+3. Load the examples from the provided json file
+4. Prepare the common instructions and in-context learning for the Azure OpenAI completions model that includes:
+    - Instructions to identify and classify the drawing features in the image
+    - The example images of drawing features
+    - The example classification json file for each example image
+5. For each page in the PDF:
+    1. Extract the page image using PyMuPDF
+    2. Given an image of the drawing and optionally candidate features JSON shown on the image, and recommendations, the following steps:
+        1. Identify drawing features:
+            - creates a prompt for the Azure OpenAI completions model to identify and classify the drawing features in the image 
+            - **Edit 9/4/2025: 1:02** Display a normalized image scale on all sides of the image (top, bottom, left, right) with 11 divisions numbered 0.0 to 1.0 in increments of 0.1.
+            - **Edit 9/4/2025: 1:02** Display un-numbered tick marks every 0.025
+            - **Edit 9/4/2025: 1:02** Scale the number size to fit the image size so the numbers are legible. 
+            - Load in-context learning images and examples into the prompt
+            - **Edit 9/4/2025: 1:02**, **Edit 9/24/2025: 3:19** Describe the normalized image coordinate system (normalized coordinates [left, top, right, bottom] in the range 0.0 to 1.0 where (0,0) is the bottom left of the image and (1.0,1.0) is the top right of the image.) in examples and images provided to the vision language model (VLM)
+            - Load the new image to classify into the prompt
+            - Within an Python try-except block:
+                - Calls the selected vision language model 
+                - Attempt to parse the returned model outputs into a JSON, structure
+                - Exit immediately if the error is not recoverable.
+                - Repeat on failure up to a maximum number of retries prompting with JSON parsing error message to correct the issue
+            - If the parsing is successful, save the output to a json file in the output directory
+            - Draw bounding boxes around the classified features on the image
+            - Save the marked-up image to the output directory
+        2. Run the 'evaluate_features' function that, given a marked-up image path, a list of the detected 
+            features, and the iteration number, evaluates the classified features and provides a detailed evaluation dictionary.  
+            'evaluate_features' also recommends whether to continue or stop the classification process.  
+            'evaluate_features' should follow the following logic:
+            - The function signature should be: evaluate_features(self, marked_up_img: str, features: List[Dict], iteration: int) -> Dict
+            - open the in-context learning examples defined by the parameter 'evaluation' (default experiments/config/evaluation.json) 
+            - generate a vision-language model prompt that includes:
+                - the instructions to evaluate the classified features and provide recommended improvements to the classification
+                - includes in-context learning examples
+                - provides the marked-up image of the drawing with the detected features
+                - calls the Azure OpenAI completions model to generate the issues found and the recommendation
+            - Within a Python try-except block:
+                - Call the Azure OpenAI model identified by the parameter 'model' with the prompt
+                - parse the response to extract a dictionary containing: issues, recommendation, quality_score, completeness
+            - Retry up to a maximum number of retries (default 3) if the response cannot be parsed or there is another recoverable error
+            - If the maximum number of retries is reached, return a dictionary with empty issues list and the recommendation "fail"
+            - If successful, return the evaluation dictionary with structure: {"issues": [...], "recommendation": "continue|stop|fail", "quality_score": 0.0-1.0, "completeness": "poor|needs_improvement|good|excellent"}
+        3. Continue until one of the following conditions is met:
+            - The agent recommends stopping the classification process for n successive iterations (default n=2)
+            - The maximum number of iterations is reached (default 3)
+            - The agent fails to classify the features in the image after a maximum number of retries (default 3)
+    3. **Addition 8/19/2025 8:47** For each feature identified in the results perform the following analysis.  Initially this will be performed sequentially, but may be parallelized in the future:
+        1. Extract a high-resolution PDF crop (default 300 DPI) of the feature from the PDF with the feature size + margin (default 10%)
+        2. Using a VLM, evaluate if the feature is correctly classified and if the bounding box is accurate.  If not recommend a new bounding box and re-execute the previous step with the new bounding box.  Iterate until the VLM determines the crop is sufficient for or for a parameter-defined maximum number of iterations (default 2).
+        3. Based on the feature classification find and add the following information to the feature dictionary:
+            1. feature: title_block:
+                - extract the title block information ordered by the field significance in the drawing (size, position, etc.).
+                - When available, the JSON key names should match the uncased value in the title block with spaces and hyphens replaced by underscores.
+                - The JSON values should match the text and case in the title block.
+                - When the field name is not available, infer the field name from the drawing surround the inferred name with underscores  "_field_".
+                - If the value is empty respond with the JSON null value.
+                - If the value is unclear, respond with "_abstained_".
+                - If a character is unreadable and cannot be inferred from the context, respond replace the character with "*".
+                - Replace drafting symbols with their text equivalent when possible.
+                - Only information within the title block squares should be included.  Ignore any notes or text outside the title block area.
+                - Each title block field should be a separate JSON key.
+                - Verify all title block fields are extracted.
+                - List any uncertain fields in a separate "uncertain_fields" array.
+                - Extract as much information as possible from the title block. If any field is not visible or available, use "N/A".
+                - **Addition 8/22/2025 3:45** in the function  def extract_title_block_details:
+                    - draw the bounding boxes for each extracted field on the title block image crop_img in a unique color.  
+                    - Label each bounding box on the image with the field name.  
+                    - Save markup image with the name f"{args.results_path}/<input_pdf_basename>_page_<page_number>_feature_markup_<feature_name>_<timestamp>.json"
+                    - Include the saved image path in the feature dictionary
+                    - Log the saved feature image path to console    
+
+            2. feature: revisions
+                - extract the revision table as a JSON list of dictionaries.  
+                - The dictionary keys should match the revision table column headers.
+                - **Addition 8/22/2025 3:45** in the function  def extract_table_details:
+                    - draw the bounding boxes for each extracted field on the tables image crop_img in a unique color.  
+                    - Label each bounding box on the image with the field name.  
+                    - Save markup image with the name f"{args.results_path}/<input_pdf_basename>_page_<page_number>_feature_markup_<feature_name>_<timestamp>.json"
+                    - Include the saved image path in the feature dictionary
+                    - Log the saved feature image path to console  
+            3. feature": view
+                - description: provide a text description of the view including overall shape, size, and any other relevant details.
+                - list details of the sub-feature that are prominent on the drawing or highlighted in the dimensions.  For each sub-feature in the list:
+                    - describe the dimensions that specifies its location or size
+                    - describe the tolerances that apply to the sub-feature (local or global)
+                    - describe any notes or callouts that are relevant to this sub-feature
+                - **Addition 8/22/2025 3:45** in the function  def extract_view_details:
+                    - draw the bounding boxes for each extracted feature on the view image crop_img in a unique color.  
+                    - Label each bounding box on the image with the field name.  
+                    - Save markup image with the name f"{args.results_path}/<input_pdf_basename>_page_<page_number>_feature_markup_<feature_name>_<timestamp>.json"
+                    - Include the saved image path in the feature dictionary
+                    - Log the saved feature image path to console  
+            4. feature: note
+                - convert each note into a markdown formatted text string
+                - include the text of each note in the original language
+                - provide an english translation of each non-english note
+                - Preserve the original formatting and layout of the notes using markdown formatting notation
+                - **Addition 8/22/2025 3:45** in the function  def extract_note_details:
+                    - draw the bounding boxes for each extracted note on the view image crop_img in a unique color.  
+                    - Label each bounding box on the image with the field name.  
+                    - Save markup image with the name f"{args.results_path}/<input_pdf_basename>_page_<page_number>_feature_markup_<feature_name>_<timestamp>.json"
+                    - Include the saved image path in the feature dictionary
+                    - Log the saved feature image path to console
+            5. Do not transcribe other drawing details (e.g. border)
+        4. Include the feature information into shelly_server.py iteration_data['features'] of def process_page()
+
+
+9. Save the final results to a json file and a marked-up image in the output directory
+    - Save the output to a JSON file in the output directory with the name f"{args.results_path}/<input_pdf_basename>_page_<page_number>_features<timestamp>.json"
+    - Save the page image to the same location: f"{args.results_path}/<input_pdf_basename>_page_<page_number>_image.png"     
+
+
+## Program Generation Process
+> **PACR REQUIRED:** Perform program generation using the Plan→Act→Critique→Revise loop, recording in the report file a brief plan and critique each iteration.
+
+**REQUIRED: Agentic Loop — Plan → Act → Critique → Revise (PACR)**: Apply the PACR loop for **both***:
+
+- **Plan** — Draft a concise strategy (what to detect / what to change next). Persist this plan in logs for traceability.
+- **Act** — Execute: call the model (Responses API with Structured Outputs), run tools (OCR/layout, IoU eval), and produce outputs that must validate against the JSON Schema.
+- **Critique** — Analyze outputs quantitatively (e.g., IoU/precision/recall) and qualitatively (issues list). Store a brief self-critique memo.
+- **Revise** — Refine prompts, tool settings, or code diffs based on the critique; repeat until stop conditions are met.
+
+This pattern is inspired by **Reflexion** (self-critique across trials), **Self-Refine** (generate→critique→refine using the same model),
+and **CRITIC** (tool-interactive self-correction). You must log each PACR turn with timestamps and  *Critique* describe the limitation and possible solutions for each turn.
+
+1. List capabilities that are needed to implement the program
+2. List proposed libraries to use
+3. Identify libraries that are not included in requirements.txt
+4. Evaluate if the proposed functionality can be implemented with the libraries in requirements.txt
+5. If not, list the libraries that should be added to requirements.txt
+6. Propose the program structure
+7. List potential shortcomings of the proposed structure
+8. Repeat steps 1-7 until the structure to address shortcomings using PACR until all significant issues are resolved
+9. Iterate on steps 6-8 PACR until the structure is satisfactory or a maximum number of iterations is reached (default 7)
+10. List program objects, functions, and their purpose based on the program structure
+11. Create and save a directed program graph with the name f"{args.results_path}/<input_pdf_basename>_page_<page_number>_graph<timestamp>.json"
+    that shows the relationships between the objects and functions using the networkx JSON format:
+    {
+        "directed": true,
+        "multigraph": false,
+        "nodes": [
+            {"id": "parse_args", "label": "parse_args"},
+            {"id": "load_classifications", "label": "load_classifications"},
+            {"id": "load_examples", "label": "load_examples"},
+            {"id": "process_pdf", "label": "process_pdf"},
+            {"id": "extract_page_image", "label": "extract_page_image"},
+            {"id": "prepare_prompt", "label": "prepare_prompt"},
+            {"id": "call_openai", "label": "call_openai"},
+            {"id": "parse_response", "label": "parse_response"},
+            {"id": "save_output", "label": "save_output"},
+            {"id": "mark_up_image", "label": "mark_up_image"}
+        ],
+        "links": [
+            {"source": "parse_args", "target": "process_pdf"},
+            {"source": "load_classifications", "target": "prepare_prompt"},
+            {"source": "load_examples", "target": "prepare_prompt"},
+            {"source": "process_pdf", "target": "extract_page_image"},
+            {"source": "extract_page_image", "target": "prepare_prompt"},
+            {"source": "prepare_prompt", "target": "call_openai"},
+            {"source": "call_openai", "target": "parse_response"},
+            {"source": "parse_response", "target": "save_output"},
+            {"source": "parse_response", "target": "mark_up_image"}
+        ]
+    }
+12. Save the program graph as an HTML file using pyvis.network
+    ```python
+    import networkx as nx # Graph library
+    from pyvis.network import Network # Visualization library
+
+    graph = nx.node_link_graph(graph_json) # Load the graph from JSON
+
+    net = Network(notebook=True, cdn_resources='remote', directed=True, height='1000px', width='100%')
+    net.from_nx(graph)
+
+    network_save_path  = f"{args.results_path}/<input_pdf_basename>_page_<page_number>_graph.html"
+    net.write_html(network_save_path)
+    ```
+13. Write unit test each function and class in the unit test program experiments/test/swarm_feature_detection_unit.py
+14. Write each function and class in the main program shelly_server.py
+15. Verify each function and class with the unit tests
+16. Rewrite each the function and class that does not pass the unit tests to address the issues
+17. Verify that all unit tests pass
+18. Integrate the functions and classes as per the program graph
+19. Create integration tests in the file "experiments/test/swarm_feature_detection_integration.py" that test the following:
+    a. Tests the program with the default PDF and verify the output json file
+    b. Verify the saved page image from the default PDF
+    c. Tests the Azure OpenAI API call with to the Azure OpenAI server using the provided credentials and verify the output JSON structure
+    d. Tests error handling by providing invalid inputs and verifying that the program handles them gracefully
+20. Create the end to end test "experiments/test/swarm_feature_detection_end_to_end.py" for the  full program with the default PDF and verify the output
+21. Rewrite and re-test any part of the program that does not work as expected
+22. Create a program report "experiments/swarm_feature_detection_implementation.md" that lists: 
+    - all steps performed in the program generation process, 
+    - tests command line to run the unit tests, integration tests, and end to end tests,
+    - issues found for each test,
+    - how each issue was resolved
+    - the final status of the program
+    - limitations of the program
+    - next steps for improving the program
+23. For subsequent program changes, update, "experiments/swarm_feature_detection_implementation.md" with a new section
+    at the end of the document that lists:
+    - the date of the changes
+    - the prompt the initiated the changes
+    - the model used to make the changes
+    - list each file and the line numbers that were changed
+    - the changes made to the program
+    - issues found
+    - how each issue was resolved
+    - tests command line to run the unit tests, integration tests, and end to end tests
+    - the final status of the program after the changes
+
+
+
+## Issues to Address
+
+
+## Resolved Issues

@@ -1,0 +1,15 @@
+devices:
+  - Shelly1PM:
+    - outputs:
+        - type: relay
+          number: 1
+    - inputs:
+        - type: input
+          number: 1
+  - Shelly2.5:
+    - outputs:
+        - type: relay
+          number: 2
+    - inputs:
+        - type: input
+          number: 2
